@@ -22,8 +22,6 @@ class AppGUI(tk.Frame):
 
 
     def build_text_area(self):
-        # scroll_frame = tk.Frame(master=None)
-
         v_scroll_bar = tk.Scrollbar(self)
         # v_scroll_bar.grid(row=1, rowspan=4, column=4)
         v_scroll_bar.pack(side=tk.RIGHT, fill=tk.Y)
@@ -36,14 +34,12 @@ class AppGUI(tk.Frame):
         # self.list_box.grid(row=1, rowspan=4, column=1, columnspan=4)
         self.list_box.pack(side=tk.BOTTOM, fill=tk.BOTH)
         
-        # for x in range(100):
-        #     self.list_box.insert(tk.END, "A" * x)
-        
         v_scroll_bar.config(command=self.list_box.yview)
         h_scroll_bar.config(command=self.list_box.xview)
         
         # scroll_frame.grid(row=5, column=0, columnspan=4, padx=self.PAD_SIZE, pady=self.PAD_SIZE)
         self.pack(side=tk.BOTTOM, fill=tk.BOTH)
+        
 
     def init_copy_ui(self):
         this_frame = tk.Frame(master=self)
@@ -59,6 +55,7 @@ class AppGUI(tk.Frame):
         this_frame.pack(side=tk.LEFT, padx=10, pady=10)
         # select_source_button.grid(row=0, column=0)
 
+
     def thread_copy_files(self):
         # t1=Thread(target=self.copy_files)
         # t1.start()
@@ -68,6 +65,7 @@ class AppGUI(tk.Frame):
         self.init_copy_button.config(state=tk.DISABLED)
         ThreadCopy(self.queue, self.list_box, self.dest).start()
         self.master.after(100, self.process_queue)
+
     
     def process_queue(self):
         try:
@@ -75,18 +73,6 @@ class AppGUI(tk.Frame):
         except queue.Empty:
             self.master.after(100, self.process_queue)
     
-    # def copy_files(self):
-    #     # print(self.dest)
-    #     files_list = self.list_box.get(0, tk.END)
-    #     for i, f in enumerate(files_list):
-    #         try:
-    #             shutil.copy2(f, self.dest)
-    #         except Exception as err:
-    #             print("Error copying files: ", err)
-    #         finally:
-    #             if hash(self.list_box.get(i)) == hash(f):
-    #                 self.list_box.delete(i)
-    #                 self.list_box.insert(i, "DONE || " + f)
 
     def select_dst_dir(self):
         self.dest = filedialog.askdirectory()
@@ -100,13 +86,13 @@ class AppGUI(tk.Frame):
         
         self.validate_copy()
         
-        # for f in self.list_box.get(0, tk.END):
-        #     print(f)
+
     def validate_copy(self):
         if len(self.list_box.get(0, tk.END)) > 0 and (self.dest != None and self.dest != ()):
             self.init_copy_button.config(state=tk.ACTIVE)
         else:
             self.init_copy_button.config(state=tk.DISABLED)
+
 
     def init_ticket_ui(self):
         validate_jira_reg = (self.register(self.validate_jira_ticket), '%P')
@@ -114,7 +100,7 @@ class AppGUI(tk.Frame):
         self.ticket_number_label = tk.Label(self, text="Jira Ticket #")
         self.ticket_number_label.grid(row=1, column=0, padx=1, pady=1)
 
-        self.ticket_number_entry = tk.Entry(self, text="DTA-####")
+        self.ticket_number_entry = tk.Entry(self, text="ABC-####")
         self.ticket_number_entry.config(validate='focusout', validatecommand=validate_jira_reg)
         self.ticket_number_entry.grid(row=1, column=1, padx=1, pady=1)
 
