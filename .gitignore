@@ -1,0 +1,5 @@
+.vscode/
+tests/test_data/src/
+tests/test_data/dst/
+src/__pycache__
+tests/__pycache__
