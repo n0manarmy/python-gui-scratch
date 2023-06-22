@@ -15,44 +15,58 @@ class AppGUI(tk.Frame):
 
     def __init__(self):
         super().__init__(master=None)
+        self.master.title("Test")
+        self.master.maxsize(1280, 900)
+        self.config(width=1280, height=900)
+
         self.init_copy_ui()
         self.build_text_area()
         self.pack(fill=tk.BOTH)
+        self.pack_propagate(0)
+
+        # self.pack(fill=tk.BOTH)
         # self.grid(columnspan=10)
 
 
     def build_text_area(self):
+        # this_frame = tk.Frame(master=self, width=400, height=200)
         v_scroll_bar = tk.Scrollbar(self)
-        # v_scroll_bar.grid(row=1, rowspan=4, column=4)
-        v_scroll_bar.pack(side=tk.RIGHT, fill=tk.Y)
+        v_scroll_bar.grid(row=1, rowspan=10, column=11, sticky=tk.E+tk.N+tk.S, padx=self.PAD_SIZE, pady=self.PAD_SIZE, ipadx=2)
+        # v_scroll_bar.pack(side=tk.RIGHT, fill=tk.Y)
         
         h_scroll_bar = tk.Scrollbar(self, orient=tk.HORIZONTAL)
-        # h_scroll_bar.grid(row=4, column=0, columnspan=4)
-        h_scroll_bar.pack(side=tk.BOTTOM, fill=tk.X)
+        h_scroll_bar.grid(row=11, column=1, columnspan=10, sticky=tk.E+tk.W, padx=self.PAD_SIZE, pady=self.PAD_SIZE, ipady=2)
+        # h_scroll_bar.pack(side=tk.BOTTOM, fill=tk.X)
 
-        self.list_box = tk.Listbox(self, xscrollcommand=h_scroll_bar.set, yscrollcommand=v_scroll_bar.set)
-        # self.list_box.grid(row=1, rowspan=4, column=1, columnspan=4)
-        self.list_box.pack(side=tk.BOTTOM, fill=tk.BOTH)
+        self.list_box = tk.Listbox(self, xscrollcommand=h_scroll_bar.set, yscrollcommand=v_scroll_bar.set, width=100, height=25)
+        self.list_box.grid(row=1, rowspan=10, column=1, columnspan=10, padx=self.PAD_SIZE, pady=self.PAD_SIZE)
+        # self.list_box.pack(side=tk.BOTTOM, fill=tk.BOTH)
         
         v_scroll_bar.config(command=self.list_box.yview)
         h_scroll_bar.config(command=self.list_box.xview)
+
+        # this_frame.grid(row=1,column=1,rowspan=10,columnspan=10)
         
         # scroll_frame.grid(row=5, column=0, columnspan=4, padx=self.PAD_SIZE, pady=self.PAD_SIZE)
-        self.pack(side=tk.BOTTOM, fill=tk.BOTH)
+        # self.pack(side=tk.BOTTOM, fill=tk.BOTH)
         
 
     def init_copy_ui(self):
-        this_frame = tk.Frame(master=self)
-        self.select_src_button = tk.Button(this_frame, text="src", command=lambda : self.load_files_into_list())
-        self.select_src_button.pack(side=tk.TOP, fill=tk.BOTH)
+        # this_frame = tk.Frame(master=self)
+        self.select_src_button = tk.Button(self, text="src", command=lambda : self.load_files_into_list())
+        self.select_src_button.grid(row=1, column=0, padx=self.PAD_SIZE, pady=self.PAD_SIZE)
+        # self.select_src_button.pack(side=tk.TOP, fill=tk.BOTH)
 
-        self.select_dst_button = tk.Button(this_frame, text="dst", command=lambda : self.select_dst_dir())
-        self.select_dst_button.pack(side=tk.TOP, fill=tk.BOTH)
+        self.select_dst_button = tk.Button(self, text="dst", command=lambda : self.select_dst_dir())
+        self.select_dst_button.grid(row=2, column=0, padx=self.PAD_SIZE, pady=self.PAD_SIZE)
 
-        self.init_copy_button = tk.Button(this_frame, text="copy", command=lambda : self.thread_copy_files(), state=tk.DISABLED)
-        self.init_copy_button.pack(side=tk.TOP, fill=tk.BOTH)
+        # self.select_dst_button.pack(side=tk.TOP, fill=tk.BOTH)
 
-        this_frame.pack(side=tk.LEFT, padx=10, pady=10)
+        self.init_copy_button = tk.Button(self, text="copy", command=lambda : self.thread_copy_files(), state=tk.DISABLED)
+        self.init_copy_button.grid(row=3, column=0, padx=self.PAD_SIZE, pady=self.PAD_SIZE)
+        # self.init_copy_button.pack(side=tk.TOP, fill=tk.BOTH)
+
+        # self.pack(side=tk.LEFT, padx=10, pady=10)
         # select_source_button.grid(row=0, column=0)
 
 
@@ -65,6 +79,10 @@ class AppGUI(tk.Frame):
         self.init_copy_button.config(state=tk.DISABLED)
         ThreadCopy(self.queue, self.list_box, self.dest).start()
         self.master.after(100, self.process_queue)
+
+    
+    def collect_meta_data(self):
+        return
 
     
     def process_queue(self):
@@ -148,7 +166,4 @@ class AppGUI(tk.Frame):
 
 
 my_app = AppGUI()
-my_app.master.title("Test")
-my_app.master.maxsize(800, 600)
-my_app.config(width=800, height=600)
 my_app.mainloop()
