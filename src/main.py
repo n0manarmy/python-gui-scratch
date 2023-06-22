@@ -1,6 +1,7 @@
 import sys
 import shutil
 import tkinter as tk
+import os
 from tkinter import filedialog
 from threading import *
 from thread_copy import ThreadCopy
@@ -19,12 +20,12 @@ class AppGUI(tk.Frame):
         self.master.maxsize(1280, 900)
         self.config(width=1280, height=900)
 
-        self.init_copy_ui()
-        self.build_text_area()
+        self.build_button_frame()
+        self.build_scroll_frame()
         self.pack(fill=tk.BOTH)
 
 
-    def build_text_area(self):
+    def build_scroll_frame(self):
         scroll_frame = tk.Frame(master=self, bg="red")
 
         v_scroll_bar = tk.Scrollbar(scroll_frame, orient=tk.VERTICAL)
@@ -45,7 +46,7 @@ class AppGUI(tk.Frame):
         scroll_frame.grid(row=1, column=1, padx=self.PAD_SIZE, pady=self.PAD_SIZE)
 
 
-    def init_copy_ui(self):
+    def build_button_frame(self):
         button_frame = tk.Frame(master=self)
         button_frame.config(bg="black")
 
@@ -61,6 +62,9 @@ class AppGUI(tk.Frame):
         self.init_copy_button.pack(side=tk.TOP, fill=tk.BOTH, padx=self.PAD_SIZE, pady=self.PAD_SIZE)
         # self.init_copy_button.grid(row=3, column=0, padx=self.PAD_SIZE, pady=self.PAD_SIZE, sticky=tk.N)
 
+        self.transmit_results_button = tk.Button(button_frame, text="Log Results", command=lambda : self.transmit_results(), state=tk.DISABLED)
+        self.transmit_results_button.pack(fill=tk.BOTH, padx=self.PAD_SIZE, pady=self.PAD_SIZE)
+
         self.exit_button = tk.Button(button_frame, text="Exit", command=lambda : exit())
         self.exit_button.pack(side=tk.BOTTOM, fill=tk.BOTH, padx=self.PAD_SIZE, pady=self.PAD_SIZE)
         # self.exit_button.grid(row=10, column=0, padx=self.PAD_SIZE, pady=self.PAD_SIZE, sticky=tk.S)
@@ -69,22 +73,24 @@ class AppGUI(tk.Frame):
 
     def thread_copy_files(self):
         self.queue = queue.Queue()
+        
         self.select_src_button.config(state=tk.DISABLED)
         self.select_dst_button.config(state=tk.DISABLED)
         self.init_copy_button.config(state=tk.DISABLED)
-        ThreadCopy(self.queue, self.list_box, self.dest).start()
-        self.master.after(100, self.process_queue)
+        self.exit_button.config(state=tk.DISABLED)
+
+        self.files_list = self.list_box.get(0, tk.END)
+        
+        self.copy_thread = ThreadCopy(self.queue, self.files_list, self.list_box, self.dest, self.transmit_results_button)
+        self.copy_thread.start()
+        
+        self.master.after(100, self.copy_thread.process_queue)
 
     
-    def collect_meta_data(self):
+    def transmit_results(self):
+        for f in self.files_list:
+            print(os.stat(f))
         return
-
-    
-    def process_queue(self):
-        try:
-            msg = self.queue.get_nowait()
-        except queue.Empty:
-            self.master.after(100, self.process_queue)
     
 
     def select_dst_dir(self):
@@ -125,7 +131,6 @@ class AppGUI(tk.Frame):
 
         self.print_values_button = tk.Button(self, text="Print results", command=self.print_results, state=tk.DISABLED)
         self.print_values_button.grid(row=4,column=2,padx=10,pady=10)
-
 
 
 my_app = AppGUI()
